@@ -1,0 +1,46 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+
+vector<TreeNode*> generateTrees(int start, int end) {
+    if (start > end) {
+        return {NULL};
+    }
+
+    vector<TreeNode*> allTrees;
+
+    for (int i = start; i <= end; i++) {
+        vector<TreeNode*> leftTrees = generateTrees(start, i - 1);
+        vector<TreeNode*> rightTrees = generateTrees(i + 1, end);
+
+        for (auto left : leftTrees) {
+            for (auto right : rightTrees) {
+                TreeNode* root = new TreeNode(i);
+                root->left = left;
+                root->right = right;
+                allTrees.push_back(root);
+            }
+        }
+    }
+    return allTrees;
+}
+
+vector<TreeNode*> generateTrees(int n) {
+    if (n == 0) return {};
+    return generateTrees(1, n);
+}
+
+int main() {
+    int n = 3;
+    vector<TreeNode*> trees = generateTrees(n);
+
+    cout << "Number of Unique BSTs: " << trees.size() << endl;
+    return 0;
+}
