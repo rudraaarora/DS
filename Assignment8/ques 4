@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+struct Node {
+    int data;
+    struct Node* left;
+    struct Node* right;
+};
+
+struct Node* createNode(int value) {
+    struct Node* n = (struct Node*)malloc(sizeof(struct Node));
+    n->data = value;
+    n->left = n->right = NULL;
+    return n;
+}
+
+struct Node* insertTree() {
+    int val;
+    scanf("%d", &val);
+    if (val == -1) return NULL;
+    struct Node* root = createNode(val);
+    root->left = insertTree();
+    root->right = insertTree();
+    return root;
+}
+
+int isBST(struct Node* root, int min, int max) {
+    if (root == NULL) return 1;
+    if (root->data <= min || root->data >= max) return 0;
+    return isBST(root->left, min, root->data) &&
+           isBST(root->right, root->data, max);
+}
+
+int main() {
+    struct Node* root = insertTree();
+
+    if (isBST(root, INT_MIN, INT_MAX))
+        printf("YES");
+    else
+        printf("NO");
+
+    return 0;
+}
