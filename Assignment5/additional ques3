@@ -1,0 +1,87 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    int sum;
+    int i;
+    int j;
+} Node;
+
+typedef struct {
+    Node* arr;
+    int size;
+} MaxHeap;
+
+void swap(Node* a, Node* b) {
+    Node t = *a; *a = *b; *b = t;
+}
+
+void heapPush(MaxHeap* h, Node x) {
+    h->arr[++h->size] = x;
+    int i = h->size;
+    while (i > 1 && h->arr[i].sum > h->arr[i/2].sum) {
+        swap(&h->arr[i], &h->arr[i/2]);
+        i /= 2;
+    }
+}
+
+Node heapPop(MaxHeap* h) {
+    Node top = h->arr[1];
+    h->arr[1] = h->arr[h->size--];
+    int i = 1;
+    while (1) {
+        int l = 2*i, r = 2*i+1, largest = i;
+        if (l <= h->size && h->arr[l].sum > h->arr[largest].sum) largest = l;
+        if (r <= h->size && h->arr[r].sum > h->arr[largest].sum) largest = r;
+        if (largest == i) break;
+        swap(&h->arr[i], &h->arr[largest]);
+        i = largest;
+    }
+    return top;
+}
+
+int cmp(const void* a, const void* b) {
+    return *(int*)b - *(int*)a;
+}
+
+int main() {
+    int n, k;
+    scanf("%d %d", &n, &k);
+
+    int a[n], b[n];
+    for (int i = 0; i < n; i++) scanf("%d", &a[i]);
+    for (int i = 0; i < n; i++) scanf("%d", &b[i]);
+
+    qsort(a, n, sizeof(int), cmp);
+    qsort(b, n, sizeof(int), cmp);
+
+    MaxHeap h;
+    h.arr = (Node*)malloc((k+5) * sizeof(Node));
+    h.size = 0;
+
+    int visited[n][n];
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            visited[i][j] = 0;
+
+    heapPush(&h, (Node){a[0] + b[0], 0, 0});
+    visited[0][0] = 1;
+
+    for (int c = 0; c < k; c++) {
+        Node top = heapPop(&h);
+        printf("%d ", top.sum);
+
+        int i = top.i, j = top.j;
+
+        if (i + 1 < n && !visited[i+1][j]) {
+            heapPush(&h, (Node){a[i+1] + b[j], i+1, j});
+            visited[i+1][j] = 1;
+        }
+        if (j + 1 < n && !visited[i][j+1]) {
+            heapPush(&h, (Node){a[i] + b[j+1], i, j+1});
+            visited[i][j+1] = 1;
+        }
+    }
+
+    return 0;
+}
