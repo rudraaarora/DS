@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    int value;
+    int freq;
+} Pair;
+
+int cmp(const void* a, const void* b) {
+    Pair* x = (Pair*)a;
+    Pair* y = (Pair*)b;
+
+    if (x->freq != y->freq) 
+        return y->freq - x->freq;
+    return y->value - x->value;
+}
+
+int main() {
+    int n, k;
+    scanf("%d %d", &n, &k);
+
+    int arr[n];
+    for (int i = 0; i < n; i++) scanf("%d", &arr[i]);
+
+    Pair freqList[n];
+    int size = 0;
+
+    for (int i = 0; i < n; i++) {
+        int found = 0;
+        for (int j = 0; j < size; j++) {
+            if (freqList[j].value == arr[i]) {
+                freqList[j].freq++;
+                found = 1;
+                break;
+            }
+        }
+        if (!found) {
+            freqList[size].value = arr[i];
+            freqList[size].freq = 1;
+            size++;
+        }
+    }
+
+    qsort(freqList, size, sizeof(Pair), cmp);
+
+    for (int i = 0; i < k && i < size; i++)
+        printf("%d ", freqList[i].value);
+
+    return 0;
+}
